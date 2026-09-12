@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#070b12">
+  <title>NetScope | SOC Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">N</div>
+      <div><b>NETSCOPE</b><small>SOC PLATFORM</small></div>
+    </div>
+    <div class="nav-title">MONITOR</div>
+    <nav>
+      <a href="#overview" class="nav active" data-page="overview"><span>◈</span>Overview</a>
+      <a href="#packets" class="nav" data-page="packets"><span>⌁</span>Live Packets</a>
+      <a href="#flows" class="nav" data-page="flows"><span>⇄</span>Network Flows</a>
+    </nav>
+    <div class="nav-title">SECURITY</div>
+    <nav>
+      <a href="#incidents" class="nav" data-page="incidents"><span>!</span>Incidents <i id="sideAlerts">0</i></a>
+      <a href="#threats" class="nav" data-page="threats"><span>◎</span>Threat Intel</a>
+      <a href="#timeline" class="nav" data-page="timeline"><span>◷</span>Timeline</a>
+    </nav>
+    <div class="nav-title">SYSTEM</div>
+    <nav>
+      <a href="#about" class="nav" data-page="about"><span>⚙</span>About</a>
+    </nav>
+    <div class="side-bottom">
+      <div class="api-state"><span></span> API CONNECTED</div>
+      <small>NetScope • Local SOC</small>
+    </div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">SECURITY OPERATIONS CENTER</p>
+        <h1 id="pageTitle">Network Overview</h1>
+      </div>
+      <div class="top-right">
+        <div class="live"><span></span><b id="pollState">LIVE</b> MONITORING</div>
+        <button id="pauseBtn" class="tool" title="Pause automatic refresh">Ⅱ</button>
+        <button id="refreshBtn" class="tool" title="Refresh now">↻</button>
+        <div class="user-chip">NS</div>
+      </div>
+    </header>
+
+    <div id="error" class="error hidden"></div>
+
+    <section id="overview" class="page active">
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">PACKETS CAPTURED <em>LIVE</em></div><strong id="packets">0</strong><small>Total observed packets</small></div>
+        <div class="metric"><div class="metric-label">NETWORK FLOWS <em>ACTIVE</em></div><strong id="flows">0</strong><small>Tracked connections</small></div>
+        <div class="metric alert-card"><div class="metric-label">SECURITY ALERTS <em>ATTENTION</em></div><strong id="alerts">0</strong><small>Recorded detections</small></div>
+        <div class="metric"><div class="metric-label">PACKET RATE <em>5 SEC</em></div><strong id="rate">0</strong><small>New packets / refresh</small></div>
+      </div>
+
+      <div class="grid-two">
+        <article class="panel">
+          <div class="panel-head"><div><label>TELEMETRY</label><h2>Traffic Activity</h2></div><span class="live-text">● LIVE</span></div>
+          <div class="chart"><canvas id="traffic"></canvas></div>
+          <div class="chart-foot"><span>Recent polling windows</span><b id="peakRate">Peak 0 packets</b></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><label>DISTRIBUTION</label><h2>Protocols</h2></div></div>
+          <div id="protocols" class="protocols"></div>
+        </article>
+      </div>
+
+      <article class="panel">
+        <div class="panel-head"><div><label>DETECTION PIPELINE</label><h2>Recent Security Alerts</h2></div><button class="link-btn" data-go="incidents">View all →</button></div>
+        <div id="alertsList" class="alerts"></div>
+      </article>
+    </section>
+
+    <section id="packets" class="page">
+      <article class="panel">
+        <div class="panel-head"><div><label>PACKET CAPTURE</label><h2>Live Packets</h2></div><div class="table-tools"><input id="packetSearch" placeholder="Search IP, protocol, service…"><span id="packetMeta">0 packets</span></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Direction</th><th>Source</th><th>Destination</th><th>Protocol</th><th>Service</th><th>Size</th></tr></thead><tbody id="packetTable"></tbody></table></div>
+      </article>
+    </section>
+
+    <section id="flows" class="page">
+      <article class="panel">
+        <div class="panel-head"><div><label>CONNECTION TRACKING</label><h2>Network Flows</h2></div><span id="flowMeta"></span></div>
+        <div class="table-wrap"><table><thead><tr><th>Source</th><th>Destination</th><th>Protocol</th><th>Packets</th><th>Bytes</th></tr></thead><tbody id="flowTable"></tbody></table></div>
+      </article>
+    </section>
+
+    <section id="incidents" class="page">
+      <article class="panel">
+        <div class="panel-head"><div><label>SECURITY EVENTS</label><h2>Incident Queue</h2></div><span class="pill" id="incidentPill">0 EVENTS</span></div>
+        <div id="incidentList" class="incident-list"></div>
+      </article>
+    </section>
+
+    <section id="threats" class="page">
+      <article class="panel hero-panel">
+        <label>THREAT INTELLIGENCE</label>
+        <h2>Threat Intelligence Workspace</h2>
+        <p>NetScope's live alert feed is surfaced here as the intelligence layer. Threat-intel-specific records become visible automatically when the backend writes them into the security alert stream.</p>
+        <div class="intel-grid">
+          <div><strong id="intelEvents">0</strong><span>Security events</span></div>
+          <div><strong id="intelHigh">0</strong><span>High / critical</span></div>
+          <div><strong id="intelRules">0</strong><span>Detection rules</span></div>
+        </div>
+      </article>
+    </section>
+
+    <section id="timeline" class="page">
+      <article class="panel">
+        <div class="panel-head"><div><label>EVENT HISTORY</label><h2>Attack Timeline</h2></div></div>
+        <div id="timelineList" class="timeline"></div>
+      </article>
+    </section>
+
+    <section id="about" class="page">
+      <article class="panel hero-panel">
+        <label>PROJECT</label>
+        <h2>NetScope</h2>
+        <p>Network security monitoring and SOC platform built around packet capture, flow tracking, detection, risk analysis, threat intelligence, incident correlation and investigation workflows.</p>
+        <div class="about-grid">
+          <div><span>BACKEND</span><b>Python / Scapy</b></div>
+          <div><span>API</span><b>FastAPI</b></div>
+          <div><span>FRONTEND</span><b>HTML / CSS / JavaScript</b></div>
+          <div><span>MODE</span><b>Live local telemetry</b></div>
+        </div>
+      </article>
+    </section>
+  </main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

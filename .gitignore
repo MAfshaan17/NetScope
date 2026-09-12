@@ -1,0 +1,46 @@
+@"
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+logs/
+*.log
+*.pcap
+*.pcapng
+*.zip
+*.bak
+*.tmp
+.env
+.env.*
+.vscode/
+.idea/
+
+# Old development backups
+src/*backup*
+src/*broken*
+src/*old*
+src/*_V*.py
+src/* (1).py
+src/* (2).py
+src/* (3).py
+src/* (4).py
+src/* (5).py
+src/* (6).py
+src/* (7).py
+src/* (8).py
+src/* (9).py
+src/* (10).py
+src_v187_backup/
+
+# Root development files
+profile_engine.py
+README (1).md
+README (2).md
+README (3).md
+README_FIX.md
+README_LIVE_INTEGRATION.md
+README_UI.md
+README_V1.9.2.md
+README_V2.0.md
+README_V2.1_FINAL.md
+"@ | Set-Content .gitignore

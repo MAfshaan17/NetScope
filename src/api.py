@@ -8,132 +8,80 @@ from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(
     title="NetScope API",
-    description="Network Security Monitoring API",
-    version="1.0.0"
+    description="Network Security Monitoring and SOC API",
+    version="2.1.0",
 )
 
-
-# =========================================================
-# PATHS
-# =========================================================
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 LOG_DIR = BASE_DIR / "logs"
 DASHBOARD_DIR = BASE_DIR / "dashboard"
 
 
-# =========================================================
-# LOAD JSON
-# =========================================================
-
-def load_json(filename):
-
+def load_json(filename, default=None):
     path = LOG_DIR / filename
-
     if not path.exists():
-        return []
+        return [] if default is None else default
 
     try:
-
-        with open(
-            path,
-            "r",
-            encoding="utf-8"
-        ) as file:
-
+        with path.open("r", encoding="utf-8") as file:
             return json.load(file)
-
     except (json.JSONDecodeError, OSError):
+        return [] if default is None else default
 
-        return []
 
-
-# =========================================================
-# API ROOT
-# =========================================================
-
-@app.get("/")
+@app.get("/", include_in_schema=False)
 def root():
-
-    return {
-        "name": "NetScope",
-        "version": "1.0",
-        "status": "running"
-    }
+    return RedirectResponse(url="/dashboard/")
 
 
-# =========================================================
-# PACKETS
-# =========================================================
+@app.get("/health")
+def health():
+    return {"name": "NetScope", "version": "2.1.0", "status": "healthy"}
+
 
 @app.get("/packets")
 def packets():
-
     return load_json("packets.json")
 
 
-# =========================================================
-# FLOWS
-# =========================================================
-
 @app.get("/flows")
 def flows():
-
     return load_json("flows.json")
 
 
-# =========================================================
-# ALERTS
-# =========================================================
-
 @app.get("/alerts")
 def alerts():
-
     return load_json("security_alerts.json")
 
 
-# =========================================================
-# STATISTICS
-# =========================================================
-
 @app.get("/stats")
 def stats():
-
-    packets = load_json("packets.json")
-    flows = load_json("flows.json")
-    alerts = load_json("security_alerts.json")
-
+    packets_data = load_json("packets.json")
+    flows_data = load_json("flows.json")
+    alerts_data = load_json("security_alerts.json")
     return {
-        "packets": len(packets),
-        "flows": len(flows),
-        "alerts": len(alerts)
+        "packets": len(packets_data),
+        "flows": len(flows_data),
+        "alerts": len(alerts_data),
     }
 
 
-# =========================================================
-# DASHBOARD
-# =========================================================
+@app.get("/soc/summary")
+def soc_summary():
+    return {
+        "cases": load_json("soc_cases.json", {}),
+        "risk_trend": load_json("risk_trend.json", {}),
+    }
+
 
 if DASHBOARD_DIR.exists():
-
     app.mount(
         "/dashboard",
-        StaticFiles(
-            directory=str(DASHBOARD_DIR),
-            html=True
-        ),
-        name="dashboard"
+        StaticFiles(directory=str(DASHBOARD_DIR), html=True),
+        name="dashboard",
     )
 
 
-# =========================================================
-# DASHBOARD REDIRECT
-# =========================================================
-
-@app.get("/ui")
+@app.get("/ui", include_in_schema=False)
 def dashboard_redirect():
-
-    return RedirectResponse(
-        url="/dashboard/"
-    )
+    return RedirectResponse(url="/dashboard/")

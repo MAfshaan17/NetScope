@@ -206,6 +206,5 @@ The dashboard/API can be hosted remotely, but the packet-capture engine must run
 
 GitHub: https://github.com/MAfshaan17
 
-## 📄 License
+Somewhere building this project for learning TCP,UDP, HTTP ..etc 
 
-This project is currently published without a license file. Add a license before distributing or reusing the code under explicit open-source terms.
